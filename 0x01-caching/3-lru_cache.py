@@ -1,45 +1,31 @@
-#!/usr/bin/env python3
-"""LRUCache that inherits from BaseCaching"""
-
-
-from base_caching import BaseCaching
+#!/usr/bin/python3
+"""Create LRUCache class that inherits from BaseCaching"""
+BaseCaching = __import__('base_caching').BaseCaching
 
 
 class LRUCache(BaseCaching):
-    """
-    mainn class
-    """
+    """ Define LRUCache """
 
     def __init__(self):
+        """ Initialize LRUCache """
+        self.queue = []
         super().__init__()
-        self.lru_queue = []
 
     def put(self, key, item):
-        if key is None or item is None:
-            return
-
-        # If cache is full, discard least recently used item
-        if len(self.cache_data) >= BaseCaching.MAX_ITEMS:
-            self.__evict_lru()
-
-        self.cache_data[key] = item
-        self.__update_lru(key)
+        """ Assign the item to the dictionary """
+        if key and item:
+            if self.cache_data.get(key):
+                self.queue.remove(key)
+            self.queue.append(key)
+            self.cache_data[key] = item
+            if len(self.queue) > self.MAX_ITEMS:
+                remove = self.queue.pop(0)
+                self.cache_data.pop(remove)
+                print('DISCARD: {}'.format(remove))
 
     def get(self, key):
-        if key is None or key not in self.cache_data:
-            return None
-
-        # Update LRU queue
-        self.__update_lru(key)
-        return self.cache_data[key]
-
-    def __update_lru(self, key):
-        if key in self.lru_queue:
-            self.lru_queue.remove(key)
-        self.lru_queue.append(key)
-
-    def __evict_lru(self):
-        if self.lru_queue:
-            lru_key = self.lru_queue.pop(0)
-            del self.cache_data[lru_key]
-            print("DISCARD:", lru_key)
+        """ Return the value associated with the given key """
+        if self.cache_data.get(key):
+            self.queue.remove(key)
+            self.queue.append(key)
+        return self.cache_data.get(key)
